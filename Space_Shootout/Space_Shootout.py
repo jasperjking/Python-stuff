@@ -153,9 +153,6 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
     pygame.draw.rect(WIN, WHITE, MENU_BUTTON1)
     pygame.draw.rect(WIN, BLACK, MENU_BUTTON2)
 
-    pygame.draw.rect(WIN, WHITE, MENU_BUTTON_PAUSE1)
-    pygame.draw.rect(WIN, WHITE, MENU_BUTTON_PAUSE2) 
-
     for bullet in red_bullets:
         pygame.draw.rect(WIN, RED, bullet)
     for bullet in yellow_bullets:
@@ -185,19 +182,23 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
         WIN.blit(BULLET_SPEED_EMBLEM, (WIDTH - 10 - red_health_text.get_width() - 35 - 15 - BULLET_SPEED_EMBLEM.get_width(), HEIGHT - 36))
     
 
-    pygame.draw.rect(WIN, WHITE, MENU_BOX1)
-    pygame.draw.rect(WIN, BLACK, MENU_BOX2)
-    menu_text = MENU_FONT.render("MENU", 1, WHITE)
-    WIN.blit(menu_text, (WIDTH//2 - menu_text.get_width()//2, HEIGHT//2 - 200))
-    pygame.draw.polygon(WIN, WHITE, MENU_BUTTON_PLAY)
+    if menu_open:
+        pygame.draw.rect(WIN, WHITE, MENU_BOX1)
+        pygame.draw.rect(WIN, BLACK, MENU_BOX2)
+        menu_text = MENU_FONT.render("MENU", 1, WHITE)
+        WIN.blit(menu_text, (WIDTH//2 - menu_text.get_width()//2, HEIGHT//2 - 200))
+        pygame.draw.polygon(WIN, WHITE, MENU_BUTTON_PLAY)
 
+    else:   
+        pygame.draw.rect(WIN, WHITE, MENU_BUTTON_PAUSE1)
+        pygame.draw.rect(WIN, WHITE, MENU_BUTTON_PAUSE2) 
 
 
     pygame.display.update()
 
 
 
-
+w
 def yellow_movement(keys_pressed, yellow, yellow_vel):
         if keys_pressed[pygame.K_a] and yellow.x - yellow_vel > 0: # LEFT
             yellow.x -= yellow_vel
