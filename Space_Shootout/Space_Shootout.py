@@ -19,6 +19,8 @@ The list of all subprograms (as of 23 Feb):
 7. draw winner
 8. main
 
+code
+
 things to do:
 1. add powerups
     - sheild? - maybe change heart to sheild
