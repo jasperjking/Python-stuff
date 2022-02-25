@@ -21,13 +21,13 @@ The list of all subprograms (as of 23 Feb):
 
 things to do:
 1. add powerups
-    - faster bullets? - probably not
     - sheild? - maybe change heart to sheild
-1.5 change frequency of powerups.
-2. fix the deletion/collection of different powerups
-    - think i finished it
+2. change frequency of powerups. Maybe?
 3. get better colour theme? done?
 4. add pause button
+5. background music
+6. timer for powerups
+7. 
 
 """
 
@@ -56,6 +56,7 @@ VEL = 5
 BULLET_VEL = 7
 ASTEROID_VEL = 7
 MAX_BULLETS = 3
+ASTEROID_HITPOINTS = 5
 
 SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 55, 40
 
@@ -198,7 +199,7 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
 
 
 
-w
+
 def yellow_movement(keys_pressed, yellow, yellow_vel):
         if keys_pressed[pygame.K_a] and yellow.x - yellow_vel > 0: # LEFT
             yellow.x -= yellow_vel
@@ -270,7 +271,7 @@ def handle_asteroid(red, yellow, asteroid, yellow_bullets, red_bullets, asteroid
             red_bullets.remove(bullet)
 
     if asteroid_hitpoints == 0:
-        asteroid_hitpoints = 3
+        asteroid_hitpoints = ASTEROID_HITPOINTS
         pygame.event.post(pygame.event.Event(ASTEROID_HIT))
     return asteroid_hitpoints
 
@@ -280,10 +281,10 @@ def handle_asteroid(red, yellow, asteroid, yellow_bullets, red_bullets, asteroid
     
 def create_asteroid():
     asteroid_start_corner = random.randint(0, 3) 
-    if asteroid_start_corner == 0: asteroid_start_corner_x, asteroid_start_corner_y = 25, HEIGHT - ASTEROID_HEIGHT - 75
-    if asteroid_start_corner == 1: asteroid_start_corner_x, asteroid_start_corner_y = 25, 25
-    if asteroid_start_corner == 2: asteroid_start_corner_x, asteroid_start_corner_y = WIDTH - ASTEROID_WIDTH - 25, 25
-    if asteroid_start_corner == 3: asteroid_start_corner_x, asteroid_start_corner_y = WIDTH - ASTEROID_WIDTH - 25, HEIGHT - ASTEROID_HEIGHT - 75
+    if asteroid_start_corner == 0: asteroid_start_corner_x, asteroid_start_corner_y = 5, 5
+    if asteroid_start_corner == 1: asteroid_start_corner_x, asteroid_start_corner_y = WIDTH - ASTEROID_WIDTH - 5, 5
+    if asteroid_start_corner == 2: asteroid_start_corner_x, asteroid_start_corner_y = WIDTH - ASTEROID_WIDTH - 5, HEIGHT - ASTEROID_HEIGHT - 55
+    if asteroid_start_corner == 3: asteroid_start_corner_x, asteroid_start_corner_y = 5, HEIGHT - ASTEROID_HEIGHT - 55
 
 
     asteroid = pygame.Rect(asteroid_start_corner_x, asteroid_start_corner_y, ASTEROID_WIDTH, ASTEROID_HEIGHT)
@@ -355,7 +356,6 @@ def main():
     clock = pygame.time.Clock()
     run = True
 
-
     while run:
         clock.tick(FPS)
 
@@ -367,20 +367,28 @@ def main():
                 
                 
 
-            if event.type == pygame.KEYDOWN and not menu_open:
+            if event.type == pygame.KEYDOWN:
 
-                if event.key == pygame.K_c and len(yellow_bullets) < yellow_max_bullets:
+                if event.key == pygame.K_c and len(yellow_bullets) < yellow_max_bullets and not menu_open:
                     bullet = pygame.Rect(yellow.x + yellow.width, yellow.y + yellow.height//2 + 2, BULLET_WIDTH, BULLET_HEIGHT)
                     yellow_bullets.append(bullet)
-                    # BULLET_FIRE_SOUND.play()
+                    if DO_SOUND: BULLET_FIRE_SOUND.play()
 
-                if event.key == pygame.K_BACKSLASH and len(red_bullets) < red_max_bullets:
+                if event.key == pygame.K_BACKSLASH and len(red_bullets) < red_max_bullets and not menu_open:
                     bullet = pygame.Rect(red.x, red.y + red.height//2 + 3, BULLET_WIDTH, BULLET_HEIGHT)
                     red_bullets.append(bullet)
-                    # BULLET_FIRE_SOUND.play()
+                    if DO_SOUND: BULLET_FIRE_SOUND.play()
                 
-                if event.key == pygame.K_EQUALS:
+                if event.key == pygame.K_EQUALS and not menu_open:
                     asteroid, asteroid_x_vel, asteroid_y_vel = create_asteroid()
+                    asteroid_present = True
+
+                if event.key == pygame.K_SPACE:
+                    menu_open = not menu_open
+
+                if event.key == pygame.K_ESCAPE:
+                    run = False
+                    pygame.quit()
 
 
                 
