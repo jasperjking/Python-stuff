@@ -59,6 +59,7 @@ BULLET_VEL = 7
 ASTEROID_VEL = 7
 MAX_BULLETS = 3
 ASTEROID_HITPOINTS = 5
+SPACESHIP_HEALTH = 10
 
 SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 55, 40
 
@@ -73,7 +74,7 @@ BULLET_PADDING_X, BULLET_PADDING_Y = 4, 10
 POWERUP_TIME = 20
 
 POWERUP_BULLET_VEL = 11
-POWERUP_BULLET_NUMBER = 5
+POWERUP_BULLET_MAX = 5
 
 # declare recangles that are comonly used
 BORDER1 = pygame.Rect(WIDTH//2 - 4, 0, 8, HEIGHT - 50)
@@ -188,7 +189,7 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
     if menu_open:
         pygame.draw.rect(WIN, WHITE, MENU_BOX1)
         pygame.draw.rect(WIN, BLACK, MENU_BOX2)
-        menu_text = MENU_FONT.render("MENU", 1, WHITE)
+        menu_text = MENU_FONT.render("PAUSED", 1, WHITE)
         WIN.blit(menu_text, (WIDTH//2 - menu_text.get_width()//2, HEIGHT//2 - 200))
         pygame.draw.polygon(WIN, WHITE, MENU_BUTTON_PLAY)
 
@@ -309,7 +310,12 @@ def draw_winner(text):
     draw_text = WINNER_FONT.render(text, 1, WHITE)
     WIN.blit(draw_text, (WIDTH//2 - draw_text.get_width()//2, HEIGHT//2 - draw_text.get_height()//2))
     pygame.display.update()
-    pygame.time.delay(5000)    
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    run = False  
 
 
 
@@ -349,8 +355,8 @@ def main():
 
     menu_open = False
 
-    yellow_health = 10
-    red_health = 10
+    yellow_health = SPACESHIP_HEALTH
+    red_health = SPACESHIP_HEALTH
 
     asteroid_tick = 1
     clock_tick = 1
@@ -432,11 +438,7 @@ def main():
                     mousepos = pygame.mouse.get_pos()
                     if mousepos[0] <= WIDTH//2 + 20 and mousepos[0] >= WIDTH//2 - 20 and mousepos[1] >= HEIGHT - 45 and mousepos[1] <= HEIGHT - 5:
                         menu_open = not menu_open
-                    # if mousepos[0] <= WIDTH//2 + 20 and mousepos[0] >= WIDTH//2 and mousepos[1] >= HEIGHT//2 and mousepos[1] <= HEIGHT//2 + 20:
-                    #     stat_on = not stat_on            
-                
-
-        # fix the removal of powerups. sometimes they are changing when one is collected/removed
+                    
 
 
         for i in range(len(powerup_list_rect) - 1, -1, -1):
@@ -445,7 +447,7 @@ def main():
                     if red_health < 10:
                         red_health += 1
                 elif powerup_list[i] == BULLET_MORE:
-                    red_max_bullets = POWERUP_BULLET_NUMBER
+                    red_max_bullets = POWERUP_BULLET_MAX
                     red_max_bullets_ticks = POWERUP_TIME
                 elif powerup_list[i] == BULLET_SPEED:
                     red_bullet_vel = POWERUP_BULLET_VEL
@@ -457,7 +459,7 @@ def main():
                     if yellow_health < 10:
                         yellow_health += 1
                 elif powerup_list[i] == BULLET_MORE:
-                    yellow_max_bullets = POWERUP_BULLET_NUMBER
+                    yellow_max_bullets = POWERUP_BULLET_MAX
                     yellow_max_bullets_ticks = POWERUP_TIME    
                 elif powerup_list[i] == BULLET_SPEED:
                     yellow_bullet_vel = POWERUP_BULLET_VEL
