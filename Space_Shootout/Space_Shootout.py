@@ -1,9 +1,9 @@
 from cmath import pi
 from turtle import width
 import pygame
-import os
+import os 
 import random
-import math
+import math as maths
 pygame.font.init()
 pygame.mixer.init()
 
@@ -246,12 +246,12 @@ def handle_bullets(yellow_bullets, red_bullets, yellow, red, yellow_bullet_vel, 
         elif bullet.x < 0:
             red_bullets.remove(bullet)
 
-    for red in red_bullets:
-        for yellow in yellow_bullets:
-            if red.x + BULLET_WIDTH + BULLET_PADDING_X >= yellow.x and red.x - BULLET_WIDTH - BULLET_PADDING_X <= yellow.x:
-                if red.y + BULLET_HEIGHT + BULLET_PADDING_Y >= yellow.y and red.y - BULLET_HEIGHT - BULLET_PADDING_Y <= yellow.y:
-                    red_bullets.remove(red)
-                    yellow_bullets.remove(yellow)
+    for red_b in red_bullets:
+        for yellow_b in yellow_bullets:
+            if red_b.x + BULLET_WIDTH + BULLET_PADDING_X >= yellow_b.x and red_b.x - BULLET_WIDTH - BULLET_PADDING_X <= yellow_b.x:
+                if red_b.y + BULLET_HEIGHT + BULLET_PADDING_Y >= yellow_b.y and red_b.y - BULLET_HEIGHT - BULLET_PADDING_Y <= yellow_b.y:
+                    red_bullets.remove(red_b)
+                    yellow_bullets.remove(yellow_b)
                     
 
 
@@ -292,9 +292,9 @@ def create_asteroid():
 
     asteroid = pygame.Rect(asteroid_start_corner_x, asteroid_start_corner_y, ASTEROID_WIDTH, ASTEROID_HEIGHT)
 
-    asteroid_orientation = random.uniform(math.radians(20), math.radians(70)) + pi/2 * asteroid_start_corner # * (4 - asteroid_start_corner + 1)
-    asteroid_x_vel = math.cos(asteroid_orientation) * ASTEROID_VEL
-    asteroid_y_vel = math.sin(asteroid_orientation) * ASTEROID_VEL
+    asteroid_orientation = random.uniform(maths.radians(20), maths.radians(70)) + pi/2 * asteroid_start_corner # * (4 - asteroid_start_corner + 1)
+    asteroid_x_vel = maths.cos(asteroid_orientation) * ASTEROID_VEL
+    asteroid_y_vel = maths.sin(asteroid_orientation) * ASTEROID_VEL
 
     #if asteroid_start_corner == 1: asteorid_y_vel *= -1
     #if asteroid_start_corner == 2: asteroid_x_vel *= -1
