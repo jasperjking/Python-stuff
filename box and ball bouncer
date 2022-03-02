@@ -1,0 +1,182 @@
+import pygame
+import math as maths
+import random
+from cmath import pi
+
+pygame.font.init()
+pygame.init()
+
+WIDTH, HEIGHT = 700, 750
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+
+FPS = 60
+
+SCORE_FONT = pygame.font.SysFont('impact', 20)
+GAMEOVER_FONT = pygame.font.SysFont('comicsans', 75)
+
+WHITE = (255, 255, 255)
+GREEN = (100, 200, 100)
+BLUE = (0, 0, 200)
+GREY = (50, 50, 50)
+RED = (200, 0, 0)
+
+PLAY_BOX = pygame.Rect(50, 50, 600, 600)
+
+def sigmoid(x, a, b, c, d):
+    return a / (1 + maths.exp(- x/b + c)) + d
+
+
+def draw_window(box, score, ball, gameover, badguys):
+
+    WIN.fill(GREY)
+    pygame.draw.rect(WIN, GREEN, PLAY_BOX)
+
+    scoretext = SCORE_FONT.render("SCORE: " + str(score), 1, WHITE)
+    WIN.blit(scoretext, (50, HEIGHT - 60))
+
+
+    if gameover == False:
+
+        pygame.draw.rect(WIN, BLUE, box)
+
+        pygame.draw.circle(WIN, WHITE, (ball[0], ball[1]), 16)
+
+        for badguy in badguys:
+            pygame.draw.rect(WIN, RED, badguy)
+
+    else:
+        gameover_text = GAMEOVER_FONT.render("GAME OVER!", 1, WHITE)
+        WIN.blit(gameover_text, (WIDTH//2 - gameover_text.get_width()//2, HEIGHT//2 - 50 - gameover_text.get_height()//2))
+
+    pygame.display.update()
+
+
+
+
+
+
+def main():
+
+    box = pygame.Rect(WIDTH//2, (HEIGHT - 50)//2 , 40, 40)
+
+    x_vel, y_vel = 0, 0
+
+    score = 0
+
+    ball_present = False
+
+    run = True
+    ball_vel = 0
+
+    ball = [-100, -100]
+
+    gameover = False
+    clock = pygame.time.Clock()
+
+    badguys = []
+    badguy_x_vel = []
+    badguy_y_vel = []
+
+    while run:
+
+        clock.tick(FPS)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+
+        if gameover == False:
+            mousepos = pygame.mouse.get_pos()
+            #if mousepos[0] == 0 or mousepos[0] == 699 or mousepos[1] == 0 or mousepos[1] == 749:
+            #    mousepos = (WIDTH//2, (HEIGHT - 50)//2)
+
+
+            if mousepos != (0, 0):
+                x_vel = maths.ceil((mousepos[0] - box.x - 20) * 0.075)
+                y_vel = maths.ceil((mousepos[1] - box.y - 20) * 0.075)
+
+                
+                if box.x + x_vel <= WIDTH - 90 and box.x + x_vel >= 50: box.x += x_vel
+                elif box.x + x_vel >= WIDTH - 90: box.x = WIDTH - 90
+                elif box.x + x_vel <= 50: box.x = 50
+
+                if box.y + y_vel <= HEIGHT - 140 and box.y + y_vel >= 50: box.y += y_vel
+                elif box.y + y_vel >= HEIGHT - 140: box.y = HEIGHT - 140
+                elif box.y + y_vel <= 50: box.y = 50
+
+        #generate random ball. bouncing?
+
+
+
+            if ball_present == False:
+                ball_present = True
+
+                ball_x = random.randint(75, WIDTH - 75)
+                ball_y = random.randint(75, HEIGHT - 125)
+                ball_orientation = random.uniform(0, 2*pi)
+                ball_x_vel = maths.cos(ball_orientation) * ball_vel
+                ball_y_vel = maths.sin(ball_orientation) * ball_vel
+
+                ball = [ball_x, ball_y]
+
+            elif ball_present == True:
+                if ball[0] + ball_x_vel >= WIDTH - 70 or ball[0] + ball_x_vel <= 70: 
+                    ball_x_vel *= -1
+                if ball[1] + ball_y_vel >= HEIGHT - 120 or ball[1] + ball_y_vel <= 70:
+                    ball_y_vel *= -1
+                ball[0] += ball_x_vel
+                ball[1] += ball_y_vel
+        
+            #check collision
+            if box.x - 10 <= ball[0] and ball[0] <= box.x + 50 and box.y - 10 <= ball[1] and ball[1] <= box.y + 50:
+                ball = [-100, -100]
+                ball_present = False
+                score += 1
+                if score == 30:
+                    gameover = True
+                elif score % 5 == 0 and score != 0 and len(badguys) < 3: 
+
+                    badguy_x = random.randint(75, WIDTH - 75)
+                    badguy_y = random.randint(75, HEIGHT - 125)
+
+                    badguys.append(pygame.Rect(badguy_x, badguy_y, 30, 30))
+
+                    badguy_orientation = (random.uniform(0, 2*pi))
+
+                    badguy_x_vel.append(maths.cos(badguy_orientation))
+                    badguy_y_vel.append(maths.sin(badguy_orientation))
+
+                ball_vel = sigmoid(score, 2, 7, 1.2, 5)
+
+            
+            for i in range(0, len(badguys)):
+                if badguys[i].x + badguy_x_vel[i] >= WIDTH - 80 or badguys[i].x + badguy_x_vel[i] <= 50: 
+                    badguy_x_vel[i] *= -1
+                if badguys[i].y + badguy_y_vel[i] >= HEIGHT - 130 or badguys[i].y + badguy_y_vel[i] <= 50:
+                    badguy_y_vel[i] *= -1
+
+
+                badguys[i].x += badguy_x_vel[i] * sigmoid(score, 2, 4, 4, 5)
+                badguys[i].y += badguy_y_vel[i] * sigmoid(score, 2, 4, 4, 5)
+            
+
+            for i in range(len(badguys) - 1, -1, -1):
+                if badguys[i].colliderect(box):
+                    badguys.pop(i)
+                    badguy_x_vel.pop(i)
+                    badguy_y_vel.pop(i)
+                    score -= 6
+
+        #make obstacle
+        #detect obstacle collision
+        #end game or detract score
+
+        draw_window(box, score, ball, gameover, badguys)
+
+            
+        
+
+
+if __name__ == "__main__":
+    main()

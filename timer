@@ -1,0 +1,17 @@
+import PySimpleGUI as sg
+
+
+layout = [
+    [sg.Text("Hellow from PySimpleGUI")],
+    [sg.Button("ok")]
+]
+
+window = sg.Window("Hello World!", layout)
+
+while True:
+    event, values = window.read()
+
+    if event == "ok" or event == sg.WIN_CLOSED:
+        break
+
+window.close()

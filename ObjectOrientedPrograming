@@ -1,9 +1,0 @@
-
-
-class Dog:
-
-    def bark(self):
-        print("Bark")
-
-x = Dog()
-x.bark()
