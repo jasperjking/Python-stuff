@@ -1,6 +1,3 @@
-from re import I
-
-
 print ("Hello Word")
 i = 0
 while i < 10:
@@ -12,5 +9,9 @@ if answer == "yes":
     print ("Thanks!")
 else:
     print ("No thanks.")
+
+thislist = ["apple", "banana", "cherry"]
+thislist.append("orange")
+print(thislist)
 
 
