@@ -13,7 +13,7 @@ WIDTH, HEIGHT = 650, 700
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 PLAY_BOX = pygame.Rect(25, 25, WIDTH - 50, HEIGHT - 100)
 
-FPS = 8
+FPS = 100
 
 GREEN = (100, 200, 100)
 DARK_GREEN = (50, 150, 50)
@@ -22,6 +22,7 @@ GREY = (50, 50, 50)
 RED = (200, 0, 0)
 BLUE = (100, 100, 200)
 WHITE = (255, 255, 255)
+WHITE_ALPHA = pygame.Color(255, 255, 255, a=50)
 
 SCORE_FONT = pygame.font.SysFont('impact', 30)
 HIGHSCORE = pygame.font.SysFont('impact', 18)
@@ -29,7 +30,7 @@ RESET_FONT = pygame.font.SysFont('impact', 20)
 GAME_OVER_FONT = pygame.font.SysFont('impact', 75)
 
 
-def draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, score):
+def draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, score, renderd):
     if game_running and not paused:
         WIN.fill(BLACK)
         pygame.draw.rect(WIN, GREY, PLAY_BOX)
@@ -61,11 +62,16 @@ def draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, 
         pygame.draw.rect(WIN, BLACK, pygame.Rect(458, 637, 63, 41))
         WIN.blit(pause_button_text, (465, 645))
 
+        #s = pygame.Surface((renderd * 20 * 2 + 20, renderd * 20 * 2 + 20), pygame.SRCALPHA)
+        #s.fill((255, 255, 255, 100))
+        #WIN.blit(s, (snake_head.x - renderd * 20, snake_head.y - renderd * 20))
+        #pygame.draw.rect(WIN, pygame.Color(255, 255, 255, ), pygame.Rect(snake_head.x - renderd * 20, snake_head.y - renderd * 20, renderd*20*2, renderd*20*2))
+
     elif paused:
         paused_text = GAME_OVER_FONT.render("PAUSED", 1, WHITE)
         WIN.blit(paused_text, (WIDTH//2 - paused_text.get_width()//2, HEIGHT//2 - paused_text.get_height()//2))
 
-    else:
+    elif not game_running:
         game_over_text = GAME_OVER_FONT.render("GAME OVER", 1, WHITE)
         WIN.blit(game_over_text, (WIDTH//2 - game_over_text.get_width()//2, HEIGHT//2 - game_over_text.get_height()//2))
 
@@ -83,8 +89,9 @@ def snake_game():
     game_running = True
     paused = False
     score = 0
+    renderd = 5
 
-    with open(os.path.expanduser("~/Documents/Python stuff/snake/highscore.txt")) as file:
+    with open(os.path.expanduser("~/Documents/Python stuff/snake_ai/highscore.txt")) as file:
         highscore = file.read()
         file.close()
         highscore = int(highscore)
@@ -98,7 +105,7 @@ def snake_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 if highscore > 2:
-                    with open(os.path.expanduser("~/Documents/Python stuff/snake/highscore.txt"), 'w') as file:
+                    with open(os.path.expanduser("~/Documents/Python stuff/snake_ai/highscore.txt"), 'w') as file:
                         file.write(str(highscore))
                         file.close()
                         
@@ -124,6 +131,79 @@ def snake_game():
 
         if not paused:
 
+            #create ai to find fruit
+            #find distance to fruit
+
+            #distance = maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - snake_head.y)**2 )
+            distance = []
+            s = '  '
+
+            #recursivley find distance
+            #find optimal distance after distance, move after move
+            #or just plan out the whole sequence of moves
+
+            if snake_head_vel[1] == 1: 
+                distance.append(9999)
+            elif pygame.Rect(snake_head.x, snake_head.y - 20, 20, 20) in snake_body:
+                distance.append(9999)
+            else:  
+                distance.append(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y - 20))**2 )) #UP
+                s += "UP: " + str(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y - 20))**2 )) + ", "
+
+            if snake_head_vel[0] == -1: 
+                distance.append(9999)
+            elif pygame.Rect(snake_head.x + 20, snake_head.y, 20, 20) in snake_body:
+                distance.append(9999)
+            else:
+                distance.append(maths.sqrt( (fruit.x - (snake_head.x + 20))**2 + (fruit.y - snake_head.y)**2 ))#RIGHT
+                s += "RIGHT: " + str(maths.sqrt( (fruit.x - (snake_head.x + 20))**2 + (fruit.y - snake_head.y)**2 )) + ", "
+
+
+            if snake_head_vel[1] == -1: 
+                distance.append(9999)
+            elif pygame.Rect(snake_head.x, snake_head.y + 20, 20, 20) in snake_body:
+                distance.append(9999)
+            else:
+                distance.append(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y + 20))**2 )) #DOWN
+                s += "DOWN: " + str(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y + 20))**2 )) + ", "
+
+
+            if snake_head_vel[0] == 1: 
+                distance.append(9999)
+            elif pygame.Rect(snake_head.x - 20, snake_head.y, 20, 20) in snake_body:
+                distance.append(9999)
+            else:
+                distance.append(maths.sqrt( (fruit.x - (snake_head.x - 20))**2 + (fruit.y - snake_head.y)**2 )) #LEFT
+                s += "LEFT: " + str(maths.sqrt( (fruit.x - (snake_head.x - 20))**2 + (fruit.y - snake_head.y)**2 )) + ", "
+
+
+
+           # print(s)
+
+            min_value = min(distance)
+
+            min_index = distance.index(min_value)
+
+                #test each move to find one that moves closest
+            #else move diagonally(ish) untill bounce of wall
+
+            #UP     snake_head_vel = (0, -1)
+            #DOWN   snake_head_vel = (0, 1)
+            #LEFT   snake_head_vel = (-1, 0)
+            #RIGHT  snake_head_vel = (1, 0)
+ 
+            if min_index == 0: #UP
+                snake_head_vel = (0, -1)
+            elif min_index == 2: #DOWN
+                snake_head_vel = (0, 1)
+            elif min_index == 3 : #LEFT
+                snake_head_vel = (-1, 0)
+            elif min_index == 1: #RIGHT
+                snake_head_vel = (1, 0)
+
+
+
+
             keys_pressed = pygame.key.get_pressed()
 
 
@@ -141,7 +221,7 @@ def snake_game():
             elif keys_pressed[pygame.K_d] and snake_head_vel[0] != -1 or keys_pressed[pygame.K_RIGHT] and snake_head_vel[0] != -1: #RIGHT
                 snake_head_vel = (1, 0)
             elif keys_pressed[pygame.K_p]:
-                snake_body.append(pygame.Rect(snake_head))        
+                snake_body.append(pygame.Rect(snake_head))              
 
             #moves snake head
             snake_head.x += 20 * snake_head_vel[0]
@@ -175,21 +255,31 @@ def snake_game():
             #detect collision with wall
             if snake_head.x < 25 or snake_head.x >= WIDTH - 25 or snake_head.y < 25 or snake_head.y >= HEIGHT - 75:
                 game_running = False
+
             #detect collision with snake
             for body in snake_body:
                 if snake_head.colliderect(body) and snake_body.index(body) != len(snake_body) - 1 and snake_body.index(body) != len(snake_body) - 2:
                     game_running = False
 
         
-
+        if not game_running:
+            return score
 
             
 
-        draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, score)
+        draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, score, renderd)
 
 
 def main():
-    snake_game()
+    results = []
+    for i in range(0, 50):
+        results.append(snake_game())
+        print(i)
+
+    print("Min: " + str(min(results)))
+    print("Max: " + str(max(results)))
+    print("Avg: " + str(sum(results)/len(results)))
+
 
 
 
