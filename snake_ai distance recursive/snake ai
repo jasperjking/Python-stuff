@@ -13,7 +13,7 @@ WIDTH, HEIGHT = 650, 700
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 PLAY_BOX = pygame.Rect(25, 25, WIDTH - 50, HEIGHT - 100)
 
-FPS = 100
+FPS = 200
 
 GREEN = (100, 200, 100)
 DARK_GREEN = (50, 150, 50)
@@ -45,7 +45,7 @@ def draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, 
         
         for i in range(0, len(snake_body)):
             if i % 2 == 0:
-                pygame.draw.rect(WIN, DARK_GREEN, snake_body[i])
+                pygame.draw.rect(WIN, GREEN, snake_body[i])
             else:
                 pygame.draw.rect(WIN, GREEN, snake_body[i])
         pygame.draw.rect(WIN, BLUE, snake_head)
@@ -78,12 +78,110 @@ def draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, 
 
     pygame.display.update()
 
+def check_blockage(x, y, snake_body, orientation, iteration):
+    if iteration == 0:
+        return  True
+    else:
+        snake_head = pygame.Rect(x, y, 20, 20)
+
+        if orientation == 'U':
+            direction = (0, -1)
+        elif orientation == 'R':
+            direction = (1, 0)
+        elif orientation == 'D':
+            direction = (0, 1)
+        elif orientation == 'L':
+            direction = (-1, 0)
+
+
+        iteration -= 1
+        x = snake_head.x + direction[0] * 20
+        y = snake_head.y + direction[1] * 20
+        unblocked = False
+
+        if pygame.Rect(x, y - 20, 20, 20) not in snake_body and check_blockage(x, y - 20, snake_body, 'U', iteration):
+            unblocked = True
+
+        if pygame.Rect(x + 20, y, 20, 20) not in snake_body and check_blockage(x + 20, y, snake_body, 'R', iteration):
+            unblocked = True
+
+        if pygame.Rect(x, y + 20, 20, 20) not in snake_body and check_blockage(x, y  + 20, snake_body, 'D', iteration):
+            unblocked = True
+ 
+        if pygame.Rect(x - 20, y, 20, 20) not in snake_body and check_blockage(x - 20, y, snake_body, 'L', iteration):
+            unblocked = True
+
+        return direction
+
+
+def find_next_move(snake_head_vel, snake_head, snake_body, fruit):
+
+    #create ai to find fruit
+    #find distance to fruit
+
+    #distance = maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - snake_head.y)**2 )
+    distance = []
+    iteration = 8
+
+    #recursivley find distance
+    #find optimal distance after distance, move after move
+    #or just plan out the whole sequence of moves
+
+    iteration = 6
+
+    if snake_head_vel[1] == 1: #UP
+        distance.append(9999)
+    elif pygame.Rect(snake_head.x, snake_head.y - 20, 20, 20) in snake_body:
+        distance.append(9999)
+    elif not check_blockage(snake_head.x, snake_head.y, snake_body, 'U', iteration):
+        distance.append(9999)
+    else:  
+        distance.append(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y - 20))**2 )) 
+
+    if snake_head_vel[0] == -1: #RIGHT
+        distance.append(9999)
+    elif pygame.Rect(snake_head.x + 20, snake_head.y, 20, 20) in snake_body:
+        distance.append(9999)
+    elif not check_blockage(snake_head.x, snake_head.y, snake_body, 'R', iteration):
+        distance.append(9999)
+    else:
+        distance.append(maths.sqrt( (fruit.x - (snake_head.x + 20))**2 + (fruit.y - snake_head.y)**2 ))
+
+
+    if snake_head_vel[1] == -1: #DOWN
+        distance.append(9999)
+    elif pygame.Rect(snake_head.x, snake_head.y + 20, 20, 20) in snake_body:
+        distance.append(9999)
+    elif not check_blockage(snake_head.x, snake_head.y, snake_body, 'D', iteration):
+        distance.append(9999)
+    else:
+        distance.append(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y + 20))**2 ))
+
+
+    if snake_head_vel[0] == 1: #LEFT
+        distance.append(9999)
+    elif pygame.Rect(snake_head.x - 20, snake_head.y, 20, 20) in snake_body:
+        distance.append(9999)
+    elif not check_blockage(snake_head.x, snake_head.y, snake_body, 'L', iteration):
+        distance.append(9999)
+    else:
+        distance.append(maths.sqrt( (fruit.x - (snake_head.x - 20))**2 + (fruit.y - snake_head.y)**2 ))
+
+
+
+
+    min_value = min(distance)
+                
+
+    return distance.index(min_value)
+
+    
 
 def snake_game():
     
     snake_head_vel = (0, -1)
     
-    fruit = pygame.Rect(305, 205, 20, 20)
+    fruit = pygame.Rect(305, 205, 19, 19)
     snake_head = pygame.Rect(305, 305, 20, 20)
     snake_body = [snake_head]
     game_running = True
@@ -91,7 +189,7 @@ def snake_game():
     score = 0
     renderd = 5
 
-    with open(os.path.expanduser("~/Documents/Python stuff/snake_ai/highscore.txt")) as file:
+    with open(os.path.expanduser("~/Documents/Python stuff/snake_ai distance recursive/highscore.txt")) as file:
         highscore = file.read()
         file.close()
         highscore = int(highscore)
@@ -105,7 +203,7 @@ def snake_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 if highscore > 2:
-                    with open(os.path.expanduser("~/Documents/Python stuff/snake_ai/highscore.txt"), 'w') as file:
+                    with open(os.path.expanduser("~/Documents/Python stuff/snake_ai distance recursive/highscore.txt"), 'w') as file:
                         file.write(str(highscore))
                         file.close()
                         
@@ -131,62 +229,7 @@ def snake_game():
 
         if not paused:
 
-            #create ai to find fruit
-            #find distance to fruit
-
-            #distance = maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - snake_head.y)**2 )
-            distance = []
-            s = '  '
-
-            #recursivley find distance
-            #find optimal distance after distance, move after move
-            #or just plan out the whole sequence of moves
-
-            if snake_head_vel[1] == 1: 
-                distance.append(9999)
-            elif pygame.Rect(snake_head.x, snake_head.y - 20, 20, 20) in snake_body:
-                distance.append(9999)
-            else:  
-                distance.append(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y - 20))**2 )) #UP
-                s += "UP: " + str(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y - 20))**2 )) + ", "
-
-            if snake_head_vel[0] == -1: 
-                distance.append(9999)
-            elif pygame.Rect(snake_head.x + 20, snake_head.y, 20, 20) in snake_body:
-                distance.append(9999)
-            else:
-                distance.append(maths.sqrt( (fruit.x - (snake_head.x + 20))**2 + (fruit.y - snake_head.y)**2 ))#RIGHT
-                s += "RIGHT: " + str(maths.sqrt( (fruit.x - (snake_head.x + 20))**2 + (fruit.y - snake_head.y)**2 )) + ", "
-
-
-            if snake_head_vel[1] == -1: 
-                distance.append(9999)
-            elif pygame.Rect(snake_head.x, snake_head.y + 20, 20, 20) in snake_body:
-                distance.append(9999)
-            else:
-                distance.append(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y + 20))**2 )) #DOWN
-                s += "DOWN: " + str(maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - (snake_head.y + 20))**2 )) + ", "
-
-
-            if snake_head_vel[0] == 1: 
-                distance.append(9999)
-            elif pygame.Rect(snake_head.x - 20, snake_head.y, 20, 20) in snake_body:
-                distance.append(9999)
-            else:
-                distance.append(maths.sqrt( (fruit.x - (snake_head.x - 20))**2 + (fruit.y - snake_head.y)**2 )) #LEFT
-                s += "LEFT: " + str(maths.sqrt( (fruit.x - (snake_head.x - 20))**2 + (fruit.y - snake_head.y)**2 )) + ", "
-
-
-
-           # print(s)
-
-            min_value = min(distance)
-
-            min_index = distance.index(min_value)
-
-                #test each move to find one that moves closest
-            #else move diagonally(ish) untill bounce of wall
-
+            min_index = find_next_move(snake_head_vel, snake_head, snake_body, fruit)
             #UP     snake_head_vel = (0, -1)
             #DOWN   snake_head_vel = (0, 1)
             #LEFT   snake_head_vel = (-1, 0)
@@ -272,9 +315,9 @@ def snake_game():
 
 def main():
     results = []
-    for i in range(0, 50):
+    for i in range(0, 150):
         results.append(snake_game())
-        print(i)
+        print(str(i + 1) + ": " + str(results[i]))
 
     print("Min: " + str(min(results)))
     print("Max: " + str(max(results)))

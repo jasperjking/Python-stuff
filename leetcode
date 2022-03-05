@@ -1,0 +1,30 @@
+def maximumEvenSplit(finalSum):
+        arr = [finalSum]
+        
+        if finalSum % 2 != 0:
+            return []
+        else:
+            flag = True
+            temparr = [finalSum]
+            while flag:
+                arr = temparr
+                flag = False
+                temparr = split(arr, finalSum)
+                if sorted(temparr) == sorted(arr):
+                    flag = True
+
+                
+                
+def split(a, fsum):
+        for num in a:
+            i = 2
+            while i < fsum//2:
+                if i not in a and fsum - i not in a:
+                    a.append(i)
+                    a.append(fsum - i)
+                i += 2
+        return a
+
+print(1)
+
+print(maximumEvenSplit(12))
