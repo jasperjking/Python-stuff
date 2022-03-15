@@ -76,7 +76,10 @@ def draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, 
     pygame.display.update()
 
 
-    
+def astar(snake_head, snake_body, fruit):
+    pass
+
+
 
 def snake_game():
     
@@ -131,7 +134,7 @@ def snake_game():
 
             #a star
 
-            
+            s = astar(snake_head, snake_body, fruit)
             #UP     snake_head_vel = (0, -1)
             #DOWN   snake_head_vel = (0, 1)
             #LEFT   snake_head_vel = (-1, 0)

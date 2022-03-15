@@ -1,0 +1,14 @@
+col = 3
+row = 4
+grid = [[0] * row for i in range(col)]
+
+count = 0
+
+for i in range(0, col):
+    for j in range(0, row):
+        grid[i][j] = count
+        count += 1
+
+print(grid)
+
+print(grid[1][4])

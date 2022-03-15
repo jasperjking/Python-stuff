@@ -1,7 +1,7 @@
 import pygame
 import math as maths
 import random
-import csv
+import statistics as stats
 import os
 
 pygame.init()
@@ -10,10 +10,10 @@ pygame.font.init()
 pygame.display.set_caption("Python (haha)")
 
 WIDTH, HEIGHT = 650, 700
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+#WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 PLAY_BOX = pygame.Rect(25, 25, WIDTH - 50, HEIGHT - 100)
 
-FPS = 40
+FPS = 50
 
 GREEN = (100, 200, 100)
 DARK_GREEN = (50, 150, 50)
@@ -30,7 +30,7 @@ RESET_FONT = pygame.font.SysFont('impact', 20)
 GAME_OVER_FONT = pygame.font.SysFont('impact', 75)
 
 
-def draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, score, renderd):
+def draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, score):
     if game_running and not paused:
         WIN.fill(BLACK)
         pygame.draw.rect(WIN, GREY, PLAY_BOX)
@@ -101,7 +101,7 @@ def snake_game():
     run = True
     clock = pygame.time.Clock()
     while run:
-        clock.tick(FPS)
+        #clock.tick(FPS)
 
 
         for event in pygame.event.get():
@@ -262,18 +262,19 @@ def snake_game():
 
             
 
-        draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, score, renderd)
+        #draw_window(snake_head, snake_body, fruit, game_running, paused, highscore, score)
 
 
 def main():
     results = []
-    for i in range(0, 150):
+    for i in range(0, 10000):
         results.append(snake_game())
         print(str(i + 1) + ": " + str(results[i]))
 
     print("Min: " + str(min(results)))
     print("Max: " + str(max(results)))
     print("Avg: " + str(sum(results)/len(results)))
+    print(f"St Dev: {str(stats.stdev(results))}")
 
 
 

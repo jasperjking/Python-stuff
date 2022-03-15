@@ -121,7 +121,7 @@ def find_next_move(snake_head_vel, snake_head, snake_body, fruit):
 
     #distance = maths.sqrt( (fruit.x - snake_head.x)**2 + (fruit.y - snake_head.y)**2 )
     distance = []
-    iteration = 8
+    iteration = 200
 
     #recursivley find distance
     #find optimal distance after distance, move after move
@@ -197,7 +197,7 @@ def snake_game():
     run = True
     clock = pygame.time.Clock()
     while run:
-        clock.tick(FPS)
+        #clock.tick(FPS)
 
 
         for event in pygame.event.get():
