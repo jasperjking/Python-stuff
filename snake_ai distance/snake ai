@@ -10,7 +10,7 @@ pygame.font.init()
 pygame.display.set_caption("Python (haha)")
 
 WIDTH, HEIGHT = 650, 700
-#WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 PLAY_BOX = pygame.Rect(25, 25, WIDTH - 50, HEIGHT - 100)
 
 FPS = 50
