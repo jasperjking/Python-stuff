@@ -143,8 +143,6 @@ def snake_game():
            #find optimal distance after distance, move after move
             #or just plan out the whole sequence of moves
 
-            iteration = 6
-
             if snake_head_vel[1] == 1: #UP
                 distance.append(9999)
             elif pygame.Rect(snake_head.x, snake_head.y - 20, 20, 20) in snake_body:

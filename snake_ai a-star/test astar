@@ -46,7 +46,7 @@ def d(target, neighbour):
 
 #A* finds a path from start to goal.
 # h is the heuristic function. h(n) estimates the cost to reach goal from node n.
-def A_Star(start, goal):
+def A_Star(start, goal, grid):
     # The set of discovered nodes that may need to be (re-)expanded.
     # Initially, only the start node is known.
     # This is usually implemented as a min-heap or priority queue rather than a hash-set.
@@ -109,17 +109,40 @@ def A_Star(start, goal):
     # Open set is empty but goal was never reached
     return "failure"
 
+def square():
+    pass
 
 
 def main():
     run = True
     clock = pygame.time.Clock()
 
-    grid = [[0] * 10 for i in range(10)]
+    ROW = 10
+    COL = 10
 
-    neighbours = [[0] * 10 for i in range(10)]
+    grid = [[square()] * ROW for i in range(COL)]
+
+    neighbours = [[0] * ROW for i in range(COL)]
 
 
+    """for i in range(COL):
+        for j in range(ROW):
+            if grid[i][j] == -1:
+                goal = [i, j]
+            elif grid[i][j] == 1:
+                start = [i, j]"""
+
+    goal = [9, 9]
+
+    grid[goal[0]][goal[1]] = -1
+
+    start = [0, 0]
+
+    grid[start[0]][start[1]] = 1
+
+
+
+    A_Star(start, goal, grid)
 
     while run:
         clock.tick(FPS)

@@ -16,9 +16,7 @@ WIDTH, HEIGHT = 650, 700
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 PLAY_BOX = pygame.Rect(25, 25, WIDTH - 50, HEIGHT - 100)
 
-FPS = 140
-
-
+FPS = 1400
 
 GREEN = (100, 200, 100)
 DARK_GREEN = (50, 150, 50)
@@ -112,7 +110,7 @@ def snake_game():
     grid[col//2][row//3] = -1
     grid[col//2][row//3 + row//3] = 1
 
-    
+    f = [col//2, row//3]
     h = [col//2, (row + row)//3]
     
     game_running = True
@@ -187,6 +185,81 @@ def snake_game():
                 keys_pressed = []
 
 
+                distance = []
+
+                #recursivley find distance
+                #find optimal distance after distance, move after move
+                #or just plan out the whole sequence of moves
+
+                
+                if snake_head_direction == "D": #UP
+                    distance.append(9999)
+                elif h[1] == 0:
+                    distance.append(9999)
+                elif grid[h[0]][h[1]- 1] > 0:
+                    distance.append(9999)
+                else:  
+                    distance.append(maths.sqrt( (f[0] - h[0])**2 + (f[1] - (h[1] - 1))**2 )) 
+
+                if snake_head_direction == "L": #RIGHT
+                    distance.append(9999)
+                elif h[0] == col - 1:
+                    distance.append(9999)
+                elif grid[h[0] + 1][h[1]] > 0:
+                    distance.append(9999)
+                else:
+                    distance.append(maths.sqrt( (f[0] - (h[0] + 1))**2 + (f[1] - h[1])**2 ))
+
+                if snake_head_direction == "U": #DOWN
+                    distance.append(9999)
+                elif h[1] == row - 1:
+                    distance.append(9999)
+                elif grid[h[0]][h[1] + 1] > 0:
+                    distance.append(9999)
+                else:
+                    distance.append(maths.sqrt( (f[0] - h[0])**2 + (f[1] - (h[1] + 1))**2 ))
+
+                if snake_head_direction == "R": #LEFT
+                    distance.append(9999)
+                elif h[0] == 0:
+                    distance.append(9999)
+                elif grid[h[0] - 1][h[1]] > 0:
+                    distance.append(9999)
+                else:
+                    distance.append(maths.sqrt( (f[0] - (h[0] - 1))**2 + (f[1] - h[1])**2 ))
+
+
+
+
+
+                print(distance)
+
+
+
+
+
+
+                min_value = min(distance)
+                
+
+                min_index = distance.index(min_value)
+                #UP     snake_head_vel = (0, -1)
+                #DOWN   snake_head_vel = (0, 1)
+                #LEFT   snake_head_vel = (-1, 0)
+                #RIGHT  snake_head_vel = (1, 0)
+
+
+                if min_index == 0: #UP  
+                    snake_head_direction = "U"
+                elif min_index == 1: #DOWN  
+                    snake_head_direction = "R"
+                elif min_index == 2 : #LEFT 
+                    snake_head_direction = "D"
+                elif min_index == 3: #RIGHT
+                    snake_head_direction = "L"
+
+
+
 
 
                     #moves snake head
@@ -228,6 +301,8 @@ def snake_game():
                         if possible_fruit:
                             rand_fruit_index = random.randint(0, len(possible_fruit) - 1)
                             grid[possible_fruit[rand_fruit_index][0]][possible_fruit[rand_fruit_index][1]] = -1
+                            f = [possible_fruit[rand_fruit_index][0], possible_fruit[rand_fruit_index][1]]
+
                         else:
                             print("YOU HAVE WON! CONGRATULATIONS")
                             game_won = True
@@ -269,10 +344,8 @@ def snake_game():
                     if score > highscore:
                         highscore = score
 
-                    rnd = random.randint(5, 40)
-
-                    col = rnd
-                    row = 45-rnd
+                    col = random.randint(4, 50)
+                    row = random.randint(4, 50)
                     
                     sizex = 600//col
                     sizey = 600//row
@@ -303,7 +376,5 @@ def main():
 
 
 
-
 if __name__ == "__main__":
     main()
-
