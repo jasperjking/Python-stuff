@@ -232,21 +232,9 @@ def snake_game():
 
 
 
-                print(distance)
-
-
-
-
-
-
                 min_value = min(distance)
-                
 
                 min_index = distance.index(min_value)
-                #UP     snake_head_vel = (0, -1)
-                #DOWN   snake_head_vel = (0, 1)
-                #LEFT   snake_head_vel = (-1, 0)
-                #RIGHT  snake_head_vel = (1, 0)
 
 
                 if min_index == 0: #UP  
@@ -343,12 +331,6 @@ def snake_game():
                 if gameover == True:
                     if score > highscore:
                         highscore = score
-
-                    col = random.randint(4, 50)
-                    row = random.randint(4, 50)
-                    
-                    sizex = 600//col
-                    sizey = 600//row
 
                     gameover = False
                     snake_head_direction = "U"

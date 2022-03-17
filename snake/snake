@@ -18,7 +18,7 @@ PLAY_BOX = pygame.Rect(25, 25, WIDTH - 50, HEIGHT - 100)
 
 FPS = 140
 
-
+RANDOMMODE = True
 
 GREEN = (100, 200, 100)
 DARK_GREEN = (50, 150, 50)
@@ -106,7 +106,6 @@ def snake_game():
     sizex = 600//col
     sizey = 600//row
 
-    #create grid layout 30*30
 
     grid = [[0] * row for i in range(col)]
     grid[col//2][row//3] = -1
@@ -156,6 +155,7 @@ def snake_game():
 
                         #reset
                             gameover = True
+                            paused = False
                         
                     elif mousepos[0] <= 456 + 67 and mousepos[0] >= 456 and mousepos[1] >= 635 and mousepos[1] <= 635 + 45:
                         paused = not paused
@@ -170,7 +170,7 @@ def snake_game():
             if counter % (maths.ceil(100/FPS*(sizex+sizey)/2)) == 0:
                 counter = 0
 
-            #changes orinetation of snake
+                #changes orinetation of snake
                 if pygame.K_w in keys_pressed or pygame.K_UP in keys_pressed: #UP
                     if snake_head_direction != "D":
                         snake_head_direction = "U"
@@ -269,10 +269,12 @@ def snake_game():
                     if score > highscore:
                         highscore = score
 
-                    rnd = random.randint(5, 40)
+                    if RANDOMMODE:
+                        rnd = random.randint(5, 40)
 
-                    col = rnd
-                    row = 45-rnd
+                        col = rnd
+                        row = 45-rnd
+                        
                     
                     sizex = 600//col
                     sizey = 600//row
@@ -293,7 +295,6 @@ def snake_game():
                     score = 0
                     game_won = False
                     counter = 1
-                    print((col, row))
         
 
 
