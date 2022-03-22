@@ -1,0 +1,84 @@
+import math as maths
+from turtle import pos
+import pygame
+import numpy 
+import random
+pygame.init()
+
+WIDTH, HEIGHT = 200, 200
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+FPS = 60
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+
+class blob:
+    def __init__(self, x, y):
+        self.pos = [x, y]
+        self.radius = numpy.random.random_integers(30, 45)
+        self.vel = randomvector(2)
+        self.vel = [x * numpy.random.random_integers(5, 10) for x in self.vel]
+
+    
+    def show(self):
+        pygame.draw.circle(WIN, BLACK, (self.pos[0], self.pos[1]), self.radius - 3, 2)
+
+    def update(self):
+        for i in range(len(self.pos)):
+            self.pos[i] += self.vel[i]
+
+        if self.pos[1] < 0 or self.pos[1] > WIDTH:
+            self.vel[1] *= -1
+        if self.pos[0] < 0 or self.pos[0] > HEIGHT:
+            self.vel[0] *= -1       
+
+def randomvector(n):
+    components = [numpy.random.normal() for i in range(n)]
+    r = maths.sqrt(sum(x * x for x in components))
+    v = [x/r for x in components]
+    return v
+
+
+
+def main():
+    #b = blob(100, 100) 
+    blobs = []
+    for i in range(3):
+        blobs.append(blob(random.randint(0, WIDTH), random.randint(0, HEIGHT)))
+    clock = pygame.time.Clock()
+    run = True
+    while run:
+        #clock.tick(FPS)
+
+
+        for i in range(HEIGHT):
+            for j in range(WIDTH):
+                sum = 0
+                for b in blobs:
+                    d = maths.dist((b.pos[0], b.pos[1]), (i, j))
+                    sum += round(100 * b.radius // (d + 1))
+
+                if sum > 300:
+                    sum = 300
+
+                colour = pygame.Color(0, 0, 0, 0)
+                colour.hsva = (sum, 100, 100, 100)
+
+
+                WIN.set_at((i, j), colour)
+        
+        for b in blobs:
+            b.update()
+            #b.show()
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+
+
+
+
+if __name__ == "__main__":
+    main()
