@@ -56,7 +56,7 @@ class boid:
             self.pos.y = -15
 
     def align(self, boids):
-        perception = 40
+        perception = 50
         steering = pygame.Vector2()
         total = 0
         for other in boids:
@@ -75,7 +75,7 @@ class boid:
         return steering
 
     def cohesion(self, boids):
-        perceptionradius = 40
+        perceptionradius = 50
         steering = pygame.Vector2()
         total = 0
         for other in boids:
@@ -94,7 +94,7 @@ class boid:
         return steering
 
     def separation(self, boids):
-        perceptionradius = 40
+        perceptionradius = 50
         steering = pygame.Vector2()
         total = 0
         for other in boids:

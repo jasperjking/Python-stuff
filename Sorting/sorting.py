@@ -3,14 +3,13 @@ import pygame
 import random
 import os
 pygame.init()
-pygame.mixer.init()
 pygame.display.set_caption("Sorting Algorithms")
 
 WIDTH, HEIGHT = 1024, 512
 WIN = pygame.display.set_mode((WIDTH + 50 + 150, HEIGHT + 50))
 FPS = 60
 
-NUMBER = 2*2*2*2*2*2*2*2*2*2
+NUMBER = 1024
 
 GREY = (40, 40, 40)
 WHITE = (255, 255, 255)
@@ -25,7 +24,6 @@ SHUFFLE_BUTTON = pygame.Rect(WIDTH + 75, HEIGHT - 25, 100, 50)
 PAUSE_BUTTON = pygame.Rect(WIDTH + 75, HEIGHT - 100, 100, 50)
 TOGGLE_BUTTON = pygame.Rect(WIDTH + 75, HEIGHT - 175, 100, 50)
 
-#COMPLETE_SOUND = pygame.mixer.Sound(os.path.join('Sorting', ''))
 
 
 def draw_window(arr, mode, sorted, sortedindex):
@@ -154,7 +152,7 @@ def main():
     run = True
     clock = pygame.time.Clock()
     while run:
-        clock.tick(FPS)
+        #clock.tick(FPS)
         draw_window(arr, mode[modeindex], sorted, sortedindex)
 
         for event in pygame.event.get():

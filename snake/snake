@@ -29,7 +29,7 @@ BLUE = (100, 100, 200)
 WHITE = (255, 255, 255)
 
 SCORE_FONT = pygame.font.SysFont('impact', 30)
-HIGHSCORE = pygame.font.SysFont('impact', 18)
+HIGHSCORE = pygame.font.SysFont('impact;', 18)
 RESET_FONT = pygame.font.SysFont('impact', 20)
 GAME_OVER_FONT = pygame.font.SysFont('impact', 75)
 

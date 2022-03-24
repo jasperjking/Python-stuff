@@ -1,0 +1,393 @@
+import pygame
+import numpy
+import os
+pygame.init()
+pygame.font.init()
+
+
+WIDTH, HEIGHT = 600, 500
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+WIN.fill((50, 125, 200))
+pygame.display.update()
+FPS = 60
+BLACK = (0, 0, 0)
+BLUE = (100, 150, 230)
+WHITE = (255, 255, 255)
+RED = (200, 50, 50)
+GREEN = (125, 200, 50)
+TURN_FONT = pygame.font.SysFont('timesnewroman', 30)
+SCORE_FONT = pygame.font.SysFont('timesnewroman', 25)
+
+def draw_window(grid, console_text, comscore, humanscore, draws):
+    WIN.fill(GREEN)
+    pygame.draw.rect(WIN, WHITE, pygame.Rect(49, 49, 302, 302))
+    pygame.draw.rect(WIN, BLACK, pygame.Rect(49, 49, 302, 302), 1)
+    for i in range(3):
+        for j in range(3):
+            pygame.draw.rect(WIN, BLACK, pygame.Rect(i * 100 + 50, j * 100 + 50, 100, 100), 1)
+            if grid[i][j] == "O":
+                pygame.draw.circle(WIN, BLUE, (i * 100 + 100, j * 100 + 100), 28)
+                pygame.draw.circle(WIN, BLACK, (i * 100 + 100, j * 100 + 100), 28, 2)
+            elif grid[i][j] == "X":
+                pygame.draw.polygon(WIN, RED, ((i * 100 + 85, j * 100 + 70), (i * 100 + 70, j * 100 + 85), (i * 100 + 85, j * 100 + 100), (i * 100 + 70, j * 100 + 115), (i * 100 + 85, j * 100 + 130), (i * 100 + 100, j * 100 + 115), (i * 100 + 115, j * 100 + 130), (i * 100 + 130, j * 100 + 115), (i * 100 + 115, j * 100 + 100), (i * 100 + 130, j * 100 + 85), (i * 100 + 115, j * 100 + 70), (i * 100 + 100, j * 100 + 85)))
+                pygame.draw.polygon(WIN, BLACK, ((i * 100 + 85, j * 100 + 70), (i * 100 + 70, j * 100 + 85), (i * 100 + 85, j * 100 + 100), (i * 100 + 70, j * 100 + 115), (i * 100 + 85, j * 100 + 130), (i * 100 + 100, j * 100 + 115), (i * 100 + 115, j * 100 + 130), (i * 100 + 130, j * 100 + 115), (i * 100 + 115, j * 100 + 100), (i * 100 + 130, j * 100 + 85), (i * 100 + 115, j * 100 + 70), (i * 100 + 100, j * 100 + 85)), 3)
+
+
+    pygame.draw.rect(WIN, WHITE, pygame.Rect(418, 150, 115, 64))
+    pygame.draw.rect(WIN, BLACK, pygame.Rect(418, 150, 115, 64), 2)
+    restart_text = TURN_FONT.render("Restart", 1, BLACK)
+    WIN.blit(restart_text, (433, 165))
+
+    #print((restart_text.get_height(), restart_text.get_width())) --> (34, 85)
+
+
+    player_text = TURN_FONT.render(console_text, 1, BLACK)
+        
+    WIN.blit(player_text, (200 - player_text.get_width()//2, 400))
+
+    comscore_text = SCORE_FONT.render("Computer score: " + str(comscore), 1, BLACK)
+    humanscore_text = SCORE_FONT.render("Human score: " + str(humanscore), 1, BLACK)
+    draw_text = SCORE_FONT.render("Draws: " + str(draws), 1, BLACK)
+    WIN.blit(comscore_text, (475 - comscore_text.get_width()//2, 250))
+    WIN.blit(humanscore_text, (475 - comscore_text.get_width()//2, 300))
+    WIN.blit(draw_text, (475 - comscore_text.get_width()//2, 350))
+
+
+
+
+    pygame.display.update()
+
+def testforwin(grid, swap):
+    for i in range(3):
+        for j in range(3):
+            if grid[i][j] == "_":
+                grid[i][j] = "O"
+                if gameover(grid):
+                    if not swap: grid[i][j] = "_"
+                    return True
+                else:
+                    grid[i][j] = "_"
+
+def testtoblock(grid):
+    for i in range(3):
+        for j in range(3):
+            if grid[i][j] == "_":
+                grid[i][j] = "X"
+                if gameover(grid):
+                    grid[i][j] = "O"
+                    return True
+                else:
+                    grid[i][j] = "_"
+
+def testforfork(grid):
+    for i in range(3):
+        for j in range(3):
+            if grid[i][j] == "_":
+                grid[i][j] = "O"
+                if testforwin(grid, False):
+                    
+                    return True
+                    
+                else:
+                    grid[i][j] = "_"
+
+def testforkintwo(grid):
+    pass
+
+def randomcorner(grid):
+    possible = []
+    if grid[0][0] == "_":
+        possible.append([0, 0])
+    if grid[2][0] == "_":
+        possible.append([2, 0])
+    if grid[0][2] == "_":
+        possible.append([0, 2])
+    if grid[2][2] == "_":
+        possible.append([2, 2])
+
+    if len(possible) > 0:
+        randindex = numpy.random.randint(0, len(possible))
+        grid[possible[randindex][0]][possible[randindex][1]] = "O"
+        return True
+    else:
+        return False
+
+def randomsquare(grid):
+    possible = []
+    for i in range(3):
+        for j in range(3):
+            if grid[i][j] == "_":
+                possible.append([i, j])
+    if len(possible) > 0:
+        randindex = numpy.random.randint(0, len(possible))
+        grid[possible[randindex][0]][possible[randindex][1]] = "O"
+
+    
+def gameover(grid):
+    if grid[0][0] == grid[0][1] and grid[0][1] == grid[0][2] and grid[0][0] != "_": return True
+    if grid[1][0] == grid[1][1] and grid[1][1] == grid[1][2] and grid[1][0] != "_": return True
+    if grid[2][0] == grid[2][1] and grid[2][1] == grid[2][2] and grid[2][0] != "_": return True
+    if grid[0][0] == grid[1][0] and grid[1][0] == grid[2][0] and grid[0][0] != "_": return True
+    if grid[0][1] == grid[1][1] and grid[1][1] == grid[2][1] and grid[0][1] != "_": return True
+    if grid[0][2] == grid[1][2] and grid[1][2] == grid[2][2] and grid[0][2] != "_": return True
+    if grid[0][0] == grid[1][1] and grid[1][1] == grid[2][2] and grid[0][0] != "_": return True
+    if grid[0][2] == grid[1][1] and grid[1][1] == grid[2][0] and grid[0][2] != "_": return True
+
+
+def commove(grid):
+    moved = False
+    #test for win
+    #test to block
+    #test for fork
+    #test to block fork
+    #test for fork in two
+    #random cornet
+    #random square (catch all)
+    if not moved: moved = testforwin(grid, True)
+    if not moved: moved = testtoblock(grid)
+    if not moved: moved = testforfork(grid)
+    if not moved: moved = testforkintwo(grid)
+    if not moved: moved = randomcorner(grid)
+    if not moved: randomsquare(grid)
+
+def main():
+    clock = pygame.time.Clock()
+    run = True
+    grid = [["_"] * 3 for i in range(3)]
+    console_text = "Your turn"
+    humanscore = ""
+    comscore = ""
+    draws = ""
+    thinktime = 0
+    gamestates = []
+    with open(os.path.expanduser("~/Documents/Python stuff/TTT/score.txt"), "r") as file:
+        score = file.read()
+        file.close()
+        index = 0
+        while score[index] != "/":
+            comscore += score[index]
+            index += 1
+        index += 1
+        while score[index] != "/":
+            humanscore += score[index]
+            index += 1
+        for i in range(index + 1, len(score)):
+            draws += score[i]
+
+        comscore = int(comscore)
+        humanscore = int(humanscore)
+        draws = int(draws)
+
+    with open(os.path.expanduser("~/Documents/Python stuff/TTT/gamestates.txt"), "r") as file:
+        allstates = file.read()
+        file.close()
+
+        index = 0
+        while allstates[index] != "$":
+            
+            key = ""
+            value = ""
+            while allstates[index] != "/":
+                key += allstates[index]
+                index +=1 
+            index += 1
+            while allstates[index] != " ":
+                value += allstates[index]
+                index += 1
+            index += 1
+            gamestates.append([key, value])
+        
+        
+        
+
+    while run:
+        clock.tick(FPS)
+        draw_window(grid, console_text, comscore, humanscore, draws)
+
+        """if not player and gamewinner == 0:
+            thinktime += 1
+            if thinktime >= 60:
+                commove(grid)    
+                player = True   
+                if gameover(grid):
+                    gamewinner = 2     
+                    comscore += 1
+                else:
+                    gamewinner = 3
+                    for i in range(3):
+                        for j in range(3):
+                            if grid[i][j] == "_":
+                                gamewinner = 0
+                    if gamewinner == 3:
+                        draws += 1"""
+
+        """if not player and gamewinner == 0:
+            thinktime += 1
+            if thinktime >= 60:
+
+                foundgamestate = 0
+                currentgamestate = ""
+                for i in range(3):
+                    for j in range(3):
+                        currentgamestate += grid[i][j]
+                
+                gamestateindex = 0
+                while not foundgamestate:
+                    if gamestates[gamestateindex][0] == currentgamestate:
+                        foundgamestate = True
+                    else:
+                        gamestateindex += 1
+                        if gamestateindex == len(gamestates):
+                            key = ""
+                            value = ""
+                            for i in range(9):
+                                    key += grid[i//3][j%3]
+                                    if grid[i//3][i%3] == "_":
+                                        value += str(i * 3 + j)
+
+                            gamestates.append([key, value])
+                            
+                    if len(gamestates[gamestateindex][1]) != 0:
+                        moveindex = numpy.random.randint(0, len(gamestates[gamestateindex][1]))
+                        placetomove = int(gamestates[gamestateindex][1][moveindex])
+                        grid[placetomove//3][placetomove%3] = "O"
+                    else:
+                        #the computer resigns:(
+
+                    
+
+
+
+
+                player = True
+                if gameover(grid):
+                    gamewinner = 2
+                    comscore += 1
+                else:
+                    gamewinner = 3
+                    for i in range(3):
+                        for j in range(3):
+                            if grid[i][j] == "_":
+                                gamewinner = 0
+                    if gamewinner == 3:
+                        draws += 1
+                    """
+        if console_text == "The computer is thinking...":
+            thinktime += 1
+            if thinktime >= 60:
+                found = False
+                currentgamestate = ""
+                for i in range(9):
+                    currentgamestate += grid[i//3][i%3]
+                gamestateindex = 0
+
+                #rotation1
+                if not found:
+                    for i in range(len(gamestates)):
+                        if gamestates[i] == currentgamestate:
+                            gamestateindex = i
+                            found = True
+                            if len(gamestates[gamestateindex][1]) != 0:
+                                moveindex = numpy.random.randint(0, len(gamestates[gamestateindex][1]))
+                                placetomove = int(gamestates[gamestateindex][1][moveindex])
+                                grid[placetomove//3][placetomove%3] = "O"
+                            else:
+                                #remove last position
+                                console_text = "The computer resigns"
+                                humanscore += 1
+
+
+
+
+                #rotation2
+                currentgamestate = currentgamestate[::-1]
+                if not found:
+                    for i in range(len(gamestates)):
+                        if gamestates[i] == currentgamestate:
+                            gamestateindex = i
+                            found = True
+
+
+                #rotation3
+                if not found:
+                    pass
+
+
+                #rotation4
+                if not found:
+                    pass
+                
+
+                #generate new grid layout
+                if not found:
+                    key = ""
+                    value = ""
+                    for i in range(9):
+                            key += grid[i//3][j%3]
+                            if grid[i//3][i%3] == "_":
+                                value += str(i * 3 + j)
+                    gamestateindex = len(gamestates)
+                    gamestates.append([key, value])
+                    moveindex = numpy.random.randint(0, len(gamestates[gamestateindex][1]))
+                    placetomove = int(gamestates[gamestateindex][1][moveindex])
+                    grid[placetomove//3][placetomove%3] = "O"
+                    console_text = "Your turn"
+
+                
+
+
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                stringtowrite = str(comscore) + "/" + str(humanscore) + "/" + str(draws)
+                with open(os.path.expanduser("~/Documents/Python stuff/TTT/score.txt"), 'w') as file:
+                    file.write(stringtowrite)
+                    file.close()
+                
+                gamestatestring = ""
+                for i in range(len(gamestates)):
+                    gamestatestring += gamestates[i][0] + "/" + gamestates[i][1] + " "
+                gamestatestring += "$"
+
+                with open(os.path.expanduser("~/Documents/Python stuff/TTT/gamestates.txt"), 'w') as file:
+                    file.write(gamestatestring)
+                    file.close()
+
+                pygame.quit()
+                run = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mousepressed = pygame.mouse.get_pressed()
+                if mousepressed[0]:
+                    mousepos = pygame.mouse.get_pos()
+                    if console_text == "Your turn" and mousepos[0] > 50 and mousepos[0] < 350 and mousepos[1] > 50 and mousepos[1] < 350:
+                        i = (mousepos[0] - 50)//100
+                        j = (mousepos[1] - 50)//100
+                        if grid[i][j] == "_":
+                            grid[i][j] = "X"
+                            if gameover(grid):
+                                console_text = "You won!"
+                                humanscore += 1
+                                #gamestates[gamestateindex][1] = gamestates[gamestateindex][1].replace(gamestates[gamestateindex][1][moveindex], "")
+                            else:
+                                console_text = "It's a draw"
+                                for i in range(3):
+                                    for j in range(3):
+                                        if grid[i][j] == "_":
+                                            console_text = "The computer is thinking..."
+                                if console_text == "It's a draw":
+                                    draws += 1
+                                thinktime = 0
+
+                    elif mousepos[0] > 418 and mousepos[0] < 533 and mousepos[1] > 150 and mousepos[1] < 214:
+                        grid = [["_"] * 3 for i in range(3)]
+                        if console_text == "Your turn" or console_text == "The computer is thinking...":
+                            draws += 1
+                        console_text = "Your turn"
+
+                        
+
+
+if __name__ == "__main__":
+    main()

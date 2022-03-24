@@ -62,13 +62,9 @@ ASTEROID_HITPOINTS = 5
 SPACESHIP_HEALTH = 10
 
 SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 55, 40
-
 ASTEROID_WIDTH, ASTEROID_HEIGHT = 40, 55
-
 POWERUP_HEIGHT, POWERUP_WIDTH = 40, 40
-
 BULLET_WIDTH, BULLET_HEIGHT = 10, 5
-
 BULLET_PADDING_X, BULLET_PADDING_Y = 4, 10
 
 POWERUP_TIME = 20
@@ -95,12 +91,10 @@ MENU_BUTTON_PAUSE2 = pygame.Rect(WIDTH//2  + 3, HEIGHT - 40, 10, 30)
 MENU_BUTTON_PLAY = [(WIDTH//2 - 13, HEIGHT - 40), (WIDTH//2 - 13, HEIGHT - 10), (WIDTH//2 + 13, HEIGHT - 25)]
 
 
-
 # sounds that are used
 DO_SOUND = False
 BULLET_HIT_SOUND = pygame.mixer.Sound(os.path.join('Space_Shootout', 'Assets', 'Grenade+1.mp3'))
 BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join('Space_Shootout', 'Assets', 'Gun+Silencer.mp3'))
-
 
 
 # fonts
@@ -109,14 +103,12 @@ WINNER_FONT = pygame.font.SysFont('comicsans', 110)
 MENU_FONT = pygame.font.SysFont('comicsans', 40)
 
 
-
 # events
 YELLOW_HIT = pygame.USEREVENT + 1
 RED_HIT = pygame.USEREVENT + 2
 YELLOW_HIT_ASTEROID = pygame.USEREVENT + 3
 RED_HIT_ASTEROID = pygame.USEREVENT + 4
 ASTEROID_HIT = pygame.USEREVENT + 5
-
 
 
 # images
@@ -140,10 +132,7 @@ BULLET_SPEED_IMAGE = pygame.image.load(os.path.join('Space_Shootout', 'Assets', 
 BULLET_SPEED = pygame.transform.scale(BULLET_SPEED_IMAGE, (POWERUP_WIDTH, POWERUP_HEIGHT))
 BULLET_SPEED_EMBLEM = pygame.transform.scale(BULLET_SPEED, (POWERUP_WIDTH * 5/8, POWERUP_HEIGHT * 5/8))
 
-
 SPACE = pygame.transform.scale(pygame.image.load(os.path.join('Space_Shootout', 'Assets', 'space.png')), (WIDTH, HEIGHT))
-
-
 
 def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health, asteroid, powerup_list_rect, powerup_list, draw_yellow_max_bullets, draw_red_max_bullets, menu_open, asteroid_present, draw_yellow_speed_bullets, draw_red_speed_bullets): 
     WIN.blit(SPACE, (0,0))
@@ -200,9 +189,6 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
 
     pygame.display.update()
 
-
-
-
 def yellow_movement(keys_pressed, yellow, yellow_vel):
         if keys_pressed[pygame.K_a] and yellow.x - yellow_vel > 0: # LEFT
             yellow.x -= yellow_vel
@@ -213,9 +199,6 @@ def yellow_movement(keys_pressed, yellow, yellow_vel):
         if keys_pressed[pygame.K_s] and yellow.y + yellow_vel + yellow.height < HEIGHT - 65: # DOWN
             yellow.y += yellow_vel
 
-
-
-
 def red_movement(keys_pressed, red, red_vel):
         if keys_pressed[pygame.K_LEFT] and red.x - red_vel > BORDER1.x + 20: # LEFT
             red.x -= red_vel
@@ -225,9 +208,6 @@ def red_movement(keys_pressed, red, red_vel):
             red.y -= red_vel
         if keys_pressed[pygame.K_DOWN] and red.y + red_vel + red.height < HEIGHT - 65: # DOWN
             red.y += red_vel
-
-
-
 
 def handle_bullets(yellow_bullets, red_bullets, yellow, red, yellow_bullet_vel, red_bullet_vel):
     for bullet in yellow_bullets:
@@ -253,11 +233,6 @@ def handle_bullets(yellow_bullets, red_bullets, yellow, red, yellow_bullet_vel, 
                     red_bullets.remove(red_b)
                     yellow_bullets.remove(yellow_b)
                     
-
-
-
-
-
 def handle_asteroid(red, yellow, asteroid, yellow_bullets, red_bullets, asteroid_hitpoints):
     if asteroid.colliderect(yellow):
         pygame.event.post(pygame.event.Event(YELLOW_HIT_ASTEROID))
@@ -277,11 +252,7 @@ def handle_asteroid(red, yellow, asteroid, yellow_bullets, red_bullets, asteroid
         asteroid_hitpoints = ASTEROID_HITPOINTS
         pygame.event.post(pygame.event.Event(ASTEROID_HIT))
     return asteroid_hitpoints
-
-
-
-
-    
+  
 def create_asteroid():
     asteroid_start_corner = random.randint(0, 3) 
     if asteroid_start_corner == 0: asteroid_start_corner_x, asteroid_start_corner_y = 5, 5
@@ -303,9 +274,6 @@ def create_asteroid():
 
     return asteroid, asteroid_x_vel, asteroid_y_vel
 
-
-
-
 def draw_winner(text):
     draw_text = WINNER_FONT.render(text, 1, WHITE)
     WIN.blit(draw_text, (WIDTH//2 - draw_text.get_width()//2, HEIGHT//2 - draw_text.get_height()//2))
@@ -316,9 +284,6 @@ def draw_winner(text):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     run = False  
-
-
-
 
 def main():
 
@@ -536,9 +501,6 @@ def main():
             break
 
     main()
-
-
-
 
 if __name__ == "__main__":
     main()
