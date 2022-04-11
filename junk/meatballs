@@ -7,7 +7,7 @@ pygame.init()
 
 WIDTH, HEIGHT = 200, 200
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-FPS = 60
+FPS = 2
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -49,7 +49,7 @@ def main():
     clock = pygame.time.Clock()
     run = True
     while run:
-        #clock.tick(FPS)
+        clock.tick(FPS)
 
 
         for i in range(HEIGHT):

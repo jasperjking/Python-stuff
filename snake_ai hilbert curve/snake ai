@@ -1,0 +1,302 @@
+from gettext import find
+import pygame
+import random
+import os
+import math as maths
+import statistics
+
+pygame.init()
+pygame.font.init()
+
+pygame.display.set_caption("Python (haha)")
+
+
+
+WIDTH, HEIGHT = 650, 700
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+PLAY_BOX = pygame.Rect(25, 25, WIDTH - 50, HEIGHT - 100)
+
+GREEN = (100, 200, 100)
+BLACK = (0, 0, 0)
+GREY = (50, 50, 50)
+RED = (200, 0, 0)
+BLUE = (100, 100, 200)
+WHITE = (255, 255, 255)
+
+SCORE_FONT = pygame.font.SysFont('impact', 30)
+HIGHSCORE = pygame.font.SysFont('impact;', 18)
+RESET_FONT = pygame.font.SysFont('impact', 20)
+GAME_OVER_FONT = pygame.font.SysFont('impact', 75)
+
+
+def draw_window(grid, game_running, paused, highscore, score, game_won):
+    if game_running:
+        WIN.fill(BLACK)
+        pygame.draw.rect(WIN, GREY, PLAY_BOX)
+
+        score_text = SCORE_FONT.render("Score: " + str(score), 1, WHITE)
+        WIN.blit(score_text, (30, HEIGHT - 40 - score_text.get_height()//2))
+        highscore_text = HIGHSCORE.render("Highscore: " + str(highscore), 1, WHITE)
+        WIN.blit(highscore_text, (30 + score_text.get_width() + 10, 656))
+
+        #pygame.draw.rect(WIN, RED, fruit)
+
+        
+        #for i in range(0, len(snake_body)):
+            #pygame.draw.rect(WIN, GREEN, snake_body[i])
+        #pygame.draw.rect(WIN, BLUE, snake_head)
+        size = 600//len(grid)
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] != 0:
+                    if grid[i][j] == -1:
+                        pygame.draw.rect(WIN, RED, pygame.Rect(i*size + 25, j*size + 25, size, size))
+                    elif grid[i][j] == 1:
+                        pygame.draw.rect(WIN, BLUE, pygame.Rect(i*size + 25, j*size + 25, size, size))
+                    else:
+                        pygame.draw.rect(WIN, GREEN, pygame.Rect(i*size + 25, j*size + 25, size, size))
+
+        reset__button_text = RESET_FONT.render("RESET", 1, WHITE)
+        pygame.draw.rect(WIN, GREY, pygame.Rect(543, 635, 67, 45))
+        pygame.draw.rect(WIN, BLACK, pygame.Rect(545, 637, 63, 41))
+        WIN.blit(reset__button_text, (553, 645))
+
+
+
+        pause_button_text = RESET_FONT.render("PAUSE", 1, WHITE)
+        pygame.draw.rect(WIN, GREY, pygame.Rect(456, 635, 67, 45))
+        pygame.draw.rect(WIN, BLACK, pygame.Rect(458, 637, 63, 41))
+        WIN.blit(pause_button_text, (465, 645))
+
+        if paused and game_won:
+            game_won_text = GAME_OVER_FONT.render("YOU HAVE WON!", 1, WHITE)
+            WIN.blit(game_won_text, (WIDTH//2 - game_won_text.get_width()//2, HEIGHT//2 - game_won_text.get_height()//2))
+
+        elif paused:
+            paused_text = GAME_OVER_FONT.render("PAUSED", 1, WHITE)
+            WIN.blit(paused_text, (WIDTH//2 - paused_text.get_width()//2, HEIGHT//2 - paused_text.get_height()//2))
+            
+    else:
+        game_over_text = GAME_OVER_FONT.render("GAME OVER", 1, WHITE)
+        WIN.blit(game_over_text, (WIDTH//2 - game_over_text.get_width()//2, HEIGHT//2 - game_over_text.get_height()//2))
+
+    pygame.display.update() 
+
+
+def generate_path(grid):
+    moves_dict = {}
+    max_size_i = len(grid) - 1
+    max_size_j = len(grid[0]) - 1
+
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if i == 0: # top row
+                if j == 0:
+                    moves_dict[(i, j)] = "D"
+                else:
+                    moves_dict[(i, j)] = "L"
+            elif j == 0: #left row
+                if i == max_size_i:
+                    moves_dict[(i, j)] = "R"
+                else:
+                    moves_dict[(i, j)] = "D"
+            elif i % 2 == 0:
+                if j == 1:
+                    moves_dict[(i, j)] = "U"
+                else:
+                    moves_dict[(i, j)] = "L"
+            elif i % 2 == 1:
+                if j == max_size_j:
+                    moves_dict[(i, j)] = "U"
+                else:
+                    moves_dict[(i, j)] = "R"
+
+    return moves_dict
+                
+
+
+
+
+def snake_game():
+    
+
+    snake_head_direction = "U"
+    gameover = False
+    grow = False
+
+    col = 30
+    row = 30
+
+
+    grid = [[0] * row for i in range(col)]
+    grid[col//2][row//3] = -1
+
+    grid[col//2][(row + row)//3] = 1
+    h = [col//2, (row + row)//3]
+    
+    game_running = True
+    paused = False
+    score = 0
+    highscore = 0
+
+    game_won = False
+
+    move_dict = generate_path(grid)
+
+    with open(os.path.expanduser("~/Documents/Python stuff/snake_ai hilbert curve/highscore.txt")) as file:
+        highscore = file.read()
+        file.close()
+        highscore = int(highscore)
+
+    run = True
+
+    while run:
+
+        draw_window(grid, game_running, paused, highscore, score, game_won)
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                with open(os.path.expanduser("~/Documents/Python stuff/snake_ai hilbert curve/highscore.txt"), 'w') as file:
+                    file.write(str(highscore))
+                    file.close()
+                        
+                pygame.quit()
+                run = False
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mousepress = pygame.mouse.get_pressed()
+                if mousepress[0]:
+                    mousepos = pygame.mouse.get_pos()
+                    if mousepos[0] <= 543 + 67 and mousepos[0] >= 543 and mousepos[1] >= 635 and mousepos[1] <= 635 + 45:
+
+                        #reset
+                            gameover = True
+                            paused = False
+                        
+                    elif mousepos[0] <= 456 + 67 and mousepos[0] >= 456 and mousepos[1] >= 635 and mousepos[1] <= 635 + 45:
+                        paused = not paused
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    paused = not paused
+                if event.key == pygame.K_r or event.key == pygame.K_ESCAPE or event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
+                    gameover = True
+                    paused = False
+
+
+        
+        #find moves
+        snake_head_direction = move_dict[(h[1], h[0])]
+
+        """keys_pressed = pygame.key.get_pressed()
+
+        #changes orinetation of snake
+        if keys_pressed[pygame.K_w] or keys_pressed[pygame.K_UP]: #UP
+            if snake_head_direction != "D":
+                snake_head_direction = "U"
+        elif keys_pressed[pygame.K_s] or keys_pressed[pygame.K_DOWN]: #DOWN
+            if snake_head_direction != "U":
+                snake_head_direction = "D"
+        elif keys_pressed[pygame.K_a] or keys_pressed[pygame.K_LEFT]: #LEFT
+            if snake_head_direction != "R":
+                snake_head_direction = "L"
+        elif keys_pressed[pygame.K_d] or keys_pressed[pygame.K_RIGHT]: #RIGHT
+            if snake_head_direction != "L":
+                snake_head_direction = "R"
+                """
+
+
+        if not paused and not gameover:       #moves snake head
+            if snake_head_direction == "U":
+                h[1] -= 1
+
+            elif snake_head_direction == "D":
+                h[1] += 1
+
+            elif snake_head_direction == "L":
+                h[0] -= 1
+
+            elif snake_head_direction == "R":
+                h[0] += 1
+
+
+            if h[0] < 0 or h[0] > col - 1 or h[1] < 0 or h[1] > row - 1:
+                gameover = True
+            else:
+
+            #checks if the head == fruit
+                if grid[h[0]][h[1]] == -1:
+                    grow = True
+                    score += 1
+                    possible_fruit = []
+                    for i in range(col):
+                        for j in range(row):
+                            if grid[i][j] == 0:
+                                possible_fruit.append((i, j))
+                    
+                    if possible_fruit:
+                        rand_fruit_index = random.randint(0, len(possible_fruit) - 1)
+                        grid[possible_fruit[rand_fruit_index][0]][possible_fruit[rand_fruit_index][1]] = -1
+                    else:
+                        game_won = True
+                        paused = True
+
+
+            #moves whole snake
+                max_i_j = (0, 0)
+                max_num = 0
+                for i in range(col):
+                    for j in range(row):
+                        if grid[i][j] != 0 and grid[i][j] != -1:
+                            grid[i][j] += 1
+                            if grid[i][j] > max_num:
+                                max_i_j = (i, j)
+                                max_num = grid[i][j]
+
+            #grow or not grow the snake
+                if not grow:
+                    grid[max_i_j[0]][max_i_j[1]] = 0
+                else:
+                    grow = False
+
+            #detect collision
+                for i in range(col):
+                    for j in range(row):
+                        if i == h[0] and j == h[1] and grid[i][j] > 1:
+                            gameover = True
+
+                grid[h[0]][h[1]] = 1
+
+        if gameover == True:
+
+            if score > highscore:
+                highscore = score
+                with open(os.path.expanduser("~/Documents/Python stuff/snake/highscore.txt"), 'w') as file:
+                    file.write(str(highscore))
+                    file.close()
+
+            return score
+
+        
+
+
+
+def main():
+    results = []
+    for i in range(2000):
+        results.append(snake_game())
+        print(str(i + 1) + ": " + str(results[i]))
+
+    print(f"Min: {str(min(results))}")
+    print(f"Max: {str(max(results))}")
+    print(f"Avg: {str(sum(results)/len(results))}")
+    print(f"St Dev: {str(statistics.stdev(results))}")
+
+
+
+
+
+if __name__ == "__main__":
+    main()
+

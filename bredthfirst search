@@ -1,0 +1,132 @@
+import pygame
+import numpy
+import queue
+import time
+pygame.init()
+
+WIDTH, HEIGHT = 750, 750
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+
+def draw_grid(grid, path, found):
+    if found:
+        WIN.fill((50, 255, 50))
+    else:
+        WIN.fill((0, 0, 0))
+    pygame.draw.rect(WIN, (0, 0, 0), pygame.Rect(25, 25, 700, 700))
+    for i, row in enumerate(grid):
+        for j, value in enumerate(row):
+            colour = (255, 255, 255)
+            if value == 2:
+                colour = (100, 255, 100)
+            elif value == 3:
+                colour = (255, 100, 100)
+            elif (i, j) in path:
+                colour = (100, 100, 255)
+            elif value == -1:
+                colour = (50, 50, 50)
+            pygame.draw.rect(WIN, colour, pygame.Rect(i * 20 + 25, j * 20 + 25, 19, 19))
+    pygame.display.update()
+
+def generate_grid(x, y):
+    grid = [[0] * x for row in range(y)]
+    start_pos_x, start_pos_y = numpy.random.randint(0, x - 1), numpy.random.randint(0, y - 1)
+    grid[start_pos_x][start_pos_y] = 2
+    end_pos_x, end_pos_y = numpy.random.randint(0, x - 1), numpy.random.randint(0, y - 1)
+    grid[end_pos_x][end_pos_y] = 3
+    for i in range(x):
+        for j in range(y):
+            if numpy.random.randint(0, 10) < -1 and grid[i][j] == 0:
+                grid[i][j] = -1
+    start_pos = start_pos_x, start_pos_y
+    end = [end_pos_x, end_pos_y]
+
+    return grid, start_pos, end
+
+def find_neighbours(grid, row, col):
+    neighbours = []
+
+    if row > 0:
+        neighbours.append((row - 1, col))
+    if row + 1 < len(grid):
+        neighbours.append((row + 1, col))
+    if col > 0:
+        neighbours.append((row, col - 1))
+    if col + 1 < len(grid[0]):
+        neighbours.append((row, col + 1))
+    
+    """if row > 0 and col > 0:
+        neighbours.append((row - 1, col - 1))
+    if row > 0 and col + 1 < len(grid[0]):
+        neighbours.append((row - 1, col + 1))
+    if row + 1 < len(grid) and col > 0:
+        neighbours.append((row + 1, col - 1))
+    if row + 1 < len(grid) and col + 1 < len(grid[0]):
+        neighbours.append((row + 1, col + 1))"""
+
+    return neighbours
+
+def main():
+    grid, start_pos, end = generate_grid(35, 35)
+
+    q = queue.Queue()
+    q.put((start_pos, [start_pos]))
+
+    visited = set()
+    found = False
+    run = True
+    clock = pygame.time.Clock()
+    while run:
+        clock.tick(10)
+        time.sleep(0.02)
+
+
+        if not q.empty():
+            current_pos, path = q.get()
+            row, col = current_pos
+
+
+            if [row, col] == end:
+                q = queue.Queue()
+                found = True
+        
+        
+            else:
+                neighbours = find_neighbours(grid, row, col)
+
+                for neighbour in neighbours:
+                    r, c = neighbour
+                    if grid[r][c] != -1 and neighbour not in visited:
+                        new_path = path + [neighbour]
+                        q.put((neighbour, new_path))
+                        visited.add(neighbour)
+
+            draw_grid(grid, path, found)
+
+
+
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    grid, start_pos, end = generate_grid(35, 35)
+
+
+                    visited = set()
+                    found = False
+
+                    q = queue.Queue()
+                    q.put((start_pos, [start_pos]))
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    main()
